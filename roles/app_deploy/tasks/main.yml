@@ -1,0 +1,63 @@
+
+  - name: Delete existing app folder
+    file:
+      path: /home/{{ ansible_user }}/bootcamp-app
+      state: absent
+
+  - name: Check if unzip is installed
+    become: true
+    apt:
+     name: unzip
+     update_cache: yes       
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: /home/{{ ansible_user }}/bootcamp-app
+      state: directory
+      mode: '0755'
+
+  - name: Extract foo.tgz into /var/lib/foo
+    ansible.builtin.unarchive:
+      #src: ~myagent/_work/1/a/bootcamp-app.zip
+      src:  /home/liran/myagent/_work/3/a/bootcamp-app.zip
+      dest: /home/{{ ansible_user }}/bootcamp-app
+
+
+  - name: Create env file for weight tracker app
+    ansible.builtin.template:
+      src: /home/liran/weight-tracker-ansible-ci-cd/roles/app_deploy/templates/env.j2
+      dest: /home/{{ ansible_user }}/bootcamp-app/.env
+      owner: root
+      group: root
+      mode: '0644'
+      
+  - name: Install Dependencies with NPM install command
+    command: chdir=/home/{{ ansible_user }}/bootcamp-app npm install    
+  - name: Make sure app_startup_service is started
+    systemd:
+     name: "app_startup_service"
+     state: started 
+
+  - name: Make sure app_startup_service is started
+    systemd:
+      name: "app_startup_service"
+      state: started 
+ 
+  - name: Enable app_startup_service
+    ansible.builtin.service:
+       name: "app_startup_service"
+       enabled: yes      
+       
+
+  - name: Init postgres DB 
+    command: chdir=/home/{{ ansible_user }}/bootcamp-app npm run initdb
+    run_once: true   
+
+                          
+
+
+
+
+  
+
+  

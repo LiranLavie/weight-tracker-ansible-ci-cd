@@ -1,0 +1,9 @@
+---
+
+- hosts: all
+  become: yes
+  #Add webservers vars
+  vars_files: 
+    - ~/weight-tracker-ansible-ci-cd/inventory/webservers_vars/webservers_vars.yml
+  roles:
+    - role: app_deploy
